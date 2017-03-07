@@ -1,8 +1,8 @@
 import pygame, sys, socket, threading, time, random
 from pygame.locals import *
 
-def isInTheRect(pos, rect):
-    if abs(pos[0] - (rect[0]+rect[2]//2)) <= rect[2]//2 and abs(pos[1] - (rect[1]+rect[3]//2)) <= rect[3]//2:
+def isInTheRect(pos, rect, size):
+    if abs(pos[0] - rect[0]) <= size[0]//2 and abs(pos[1] - rect[1]) <= size[1]//2:
         return True
     else:
         return False
@@ -103,8 +103,31 @@ def main():
                 txtObj3 = txt3.get_rect()
                 txtObj3.center = Variables["btnUser"]
                 screen.blit(txt3, txtObj3)
+            
+            elif stage == 2:
+                if sakiStage != stage:
+                    sakiStage = stage
+                    Variables["isClick"] = False 
+                    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    s.connect(("gmail.com",80))
+                    Variables["HostIP"] = str(s.getsockname()[0])
+                    s.close()
+                    Variables["HostPort"] = 5678
+                
+                Variables["btnOK"] = [width*3//4, height//2]
 
+                pygame.draw.rect(screen, Color["purple"], makeRect(Variables["btnOK"], Variables["smallBtn"]))
 
+                txt1 = myCardFontBig.render("Host IP: " + Variables["HostIP"], True, Color["black"])
+                txtObj1 = txt1.get_rect()
+                txtObj1.center = (width//2, height//3)
+                screen.blit(txt1, txtObj1)
+
+                txt2 = myCardFontBig.render("Host Port: " + str(Variables["HostPort"]), True, Color["black"])
+                txtObj2 = txt2.get_rect()
+                txtObj2.center = (width//2, height*2//3)
+                screen.blit(txt2, txtObj2)
 
             pygame.display.flip()
     
@@ -112,6 +135,15 @@ def main():
                 if event.type == MOUSEBUTTONUP:
                     Variables["posClick"] = pygame.mouse.get_pos()
                     Variables["isClick"] = True
+                    if stage == 1:
+                        if isInTheRect(Variables["posClick"], Variables["btnHost"], Variables["smallBtn"]):
+                            stage = 2
+                            del Variables["btnUser"]
+                            del Variables["btnHost"]
+                        elif isInTheRect(Variables["posClick"], Variables["btnUser"], Variables["smallBtn"]):
+                            stage = 102
+                            del Variables["btnUser"]
+                            del Variables["btnHost"]
                 elif event.type == MOUSEMOTION:
                     Variables["posMotion"] = pygame.mouse.get_pos()
                 elif event.type == KEYDOWN:
@@ -119,7 +151,9 @@ def main():
                 elif event.type == QUIT:
                     pygame.quit()
                     sys.exit()
+            
             clock.tick(FPS)
+    
     except KeyboardInterrupt:
         print("")
         print("Bye")
