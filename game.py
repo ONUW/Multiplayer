@@ -1,6 +1,16 @@
 import pygame, sys, socket, threading, time, random
 from pygame.locals import *
 
+def isInTheRect(pos, rect):
+    if abs(pos[0] - (rect[0]+rect[2]//2)) <= rect[2]//2 and abs(pos[1] - (rect[1]+rect[3]//2)) <= rect[3]//2:
+        return True
+    else:
+        return False
+
+def makeRect(center, size):
+    #give center and size, do not calculte your ownself
+    return [center[0]-size[0]//2, center[1]-size[1]//2] + size
+
 def main():
     pygame.init()
     size = width, height = 1280, 720
@@ -11,7 +21,7 @@ def main():
     numberOfPlayer = 5
     numberOfChoose = 0
     Variables = {"posClick":(0,0), "posMotion":(0,0), "isClick":False}
-    FPS = 30
+    FPS = 20
     path = "resources"
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,10 +81,30 @@ def main():
             if stage == 1:
                 if sakiStage != stage:
                     sakiStage = stage
+
+                Variables["btnHost"] = [width//3, height*2//3]
+                Variables["btnUser"] = [width*2//3, height*2//3]
+                Variables["smallBtn"] = [96, 54]
+
+                pygame.draw.rect(screen, Color["purple"], makeRect(Variables["btnHost"],Variables["smallBtn"]))
+                pygame.draw.rect(screen, Color["purple"], makeRect(Variables["btnUser"],Variables["smallBtn"]))
+
                 txt1 = myCardFontBig.render("select Host or User", True, Color["black"])
                 txtObj1 = txt1.get_rect()
-                txtObj1.center = (width//2, height//2)
+                txtObj1.center = (width//2, height//3)
                 screen.blit(txt1, txtObj1)
+
+                txt2 = myCardFontBig.render("Host", True, Color["white"])
+                txtObj2 = txt2.get_rect()
+                txtObj2.center = Variables["btnHost"]
+                screen.blit(txt2, txtObj2)
+
+                txt3 = myCardFontBig.render("User", True, Color["white"])
+                txtObj3 = txt3.get_rect()
+                txtObj3.center = Variables["btnUser"]
+                screen.blit(txt3, txtObj3)
+
+
 
             pygame.display.flip()
     
