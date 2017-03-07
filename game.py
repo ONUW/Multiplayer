@@ -121,9 +121,10 @@ def main():
                     sys.exit()
             clock.tick(FPS)
     except KeyboardInterrupt:
+        print("")
+        print("Bye")
         sock.close()
         pygame.quit()
         sys.exit()
-        print("Bye")
 
 main()
